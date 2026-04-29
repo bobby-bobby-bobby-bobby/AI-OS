@@ -1,5 +1,5 @@
 #include <stdio.h>
 int main(void) {
-    puts("ai-os init (pid1) skeleton");
+    puts("launcher skeleton");
     return 0;
 }
