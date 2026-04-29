@@ -144,7 +144,7 @@ these, but not the components themselves.
 
 The AI may expand or reorganize this as needed.
 
-```text
+
 ai-os/
   SPEC.md
   TODO-AI.md
@@ -167,3 +167,160 @@ ai-os/
   docs/
   toolchain/
   rootfs/
+
+## 5. Rules for AI
+All userland code must be AI-generated.
+
+All scripts must be AI-generated unless explicitly marked otherwise.
+
+AI must maintain modularity and readability.
+
+AI must avoid unnecessary complexity.
+
+AI must ensure the OS remains buildable and bootable.
+
+AI must fix build errors when logs are provided.
+
+AI must evolve the system over time.
+
+AI must not implement custom cryptographic algorithms; it must use existing libraries/tools.
+
+## 6. Build Requirements
+The OS must build using only the scripts in build/.
+
+The OS must boot in QEMU before being considered valid.
+
+The OS must support installation to real hardware.
+
+The OS must support NVIDIA GPUs and other common hardware.
+
+The OS must support Android apps via Waydroid + microG.
+
+The OS must support Windows apps via Wine/Proton and a Windows VM.
+
+The OS must support cross-distro tools via UPCL.
+
+The OS must support universal language execution via langmgr.
+
+## 7. Legacy Mode VM
+The OS must include:
+
+A QEMU wrapper script
+
+A VM configuration template
+
+A script to download a Windows 10 evaluation ISO (or similar)
+
+A launcher that boots the VM in "Legacy Mode"
+
+The OS must NOT include Windows itself.
+
+## 8. Customization
+The OS must support:
+
+Themes
+
+Icons
+
+Wallpapers
+
+Window manager styles
+
+Desktop layouts
+
+Color schemes
+
+Fonts
+
+Boot splash themes
+
+The AI may generate theme packs and a theme editor.
+
+## 9. Cross-Distro Compatibility Layer (UPCL)
+The OS must include a Universal Package Compatibility Layer that supports:
+
+DEB (Debian/Ubuntu/Mint/Kali)
+
+RPM (Fedora/openSUSE)
+
+PKGBUILD (Arch)
+
+AppImage
+
+Flatpak
+
+Snap (optional)
+
+Nix (optional)
+
+UPCL must:
+
+extract foreign packages
+
+resolve dependencies
+
+sandbox incompatible components
+
+integrate binaries into the system PATH
+
+maintain system stability
+
+## 10. Universal Language Support (langmgr)
+The OS must include a Language Runtime Manager that supports:
+
+Modern languages (Python, Rust, Go, Java, C#, etc.)
+
+Legacy languages (BASIC, Fortran, COBOL, Pascal, Ada, Lisp, etc.)
+
+Esoteric languages (Brainfuck, Befunge, Piet, Whitespace, etc.)
+
+Academic languages (Haskell, OCaml, Erlang, ML, etc.)
+
+Emulator-based languages (QBasic, GW-BASIC, Turbo Pascal, Turbo C)
+
+VM-based languages (JVM, .NET, WebAssembly)
+
+langmgr must:
+
+maintain a registry of languages
+
+install compilers/interpreters on demand
+
+sandbox incompatible runtimes
+
+provide a universal run <file> command
+
+integrate with DOSBox, Wine, and the Windows Legacy VM
+
+be modular and AI-maintainable
+
+## 11. Privacy and Security Architecture
+The OS must use established, reputable open-source security frameworks and
+sandboxing technologies. AI must generate integration layers, automation,
+policies, and UI, but must not generate cryptographic algorithms.
+
+Security components:
+
+AppArmor or SELinux
+
+Firejail or Bubblewrap
+
+Flatpak sandboxing
+
+Encrypted home directory (LUKS or fscrypt)
+
+Automatic security updates
+
+Firewall enabled by default
+
+DNS-level ad/tracker blocking
+
+uBlock Origin in supported browsers
+
+Browser isolation via sandbox or micro-VM
+
+Specialized VMs (banking, suspicious files, legacy Windows, developer, optional browser VM)
+
+Software removal:
+
+Universal uninstaller for system apps, sandboxed apps, and VM-based apps.
