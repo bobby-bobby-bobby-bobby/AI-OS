@@ -1,0 +1,12 @@
+[Unit]
+Name=dbus
+Description=D-Bus Message Bus Daemon
+After=mount
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/dbus-daemon --system --nofork
+Restart=on-failure
+
+[Install]
+WantedBy=default

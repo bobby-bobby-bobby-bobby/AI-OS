@@ -1,0 +1,12 @@
+[Unit]
+Name=network
+Description=Network Initialization
+After=mount
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/ifconfig lo up
+Restart=no
+
+[Install]
+WantedBy=default
