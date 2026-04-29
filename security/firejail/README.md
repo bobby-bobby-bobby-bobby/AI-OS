@@ -1,0 +1,1 @@
+# Firejail profiles skeleton

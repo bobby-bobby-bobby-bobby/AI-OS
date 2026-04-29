@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cmd="${1:-}"
+case "$cmd" in
+  deb|rpm|pkgbuild|appimage|flatpak|snap|nix)
+    echo "TODO: dispatch to handler: $cmd"
+    ;;
+  *)
+    echo "usage: upcl {deb|rpm|pkgbuild|appimage|flatpak|snap|nix}" >&2
+    exit 1
+    ;;
+esac
