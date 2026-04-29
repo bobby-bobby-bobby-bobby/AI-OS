@@ -1,3 +1,3 @@
 #!/bin/sh
 set -eu
-echo "installer stub: $(basename "$0") $*"
+echo "installer stub: $(basename \"$0\")" \"$@\"
