@@ -1,23 +1,10 @@
-CC      ?= gcc
-CFLAGS  := -Wall -Wextra -std=c11 -Os
-LDFLAGS :=
+CC ?= cc
+CFLAGS ?= -Wall -Wextra -O2
+SRC := aish.c builtins.c parser.c executor.c
+all: aish
 
-SRCS    := aish.c builtins.c parser.c history.c job_control.c prompt.c
-OBJS    := $(SRCS:.c=.o)
-TARGET  := aish
-
-all: $(TARGET)
-
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+aish: $(SRC)
+	$(CC) $(CFLAGS) -o $@ $(SRC)
 
 clean:
-	rm -f $(OBJS) $(TARGET)
-
-install: $(TARGET)
-	install -Dm755 $(TARGET) $(DESTDIR)/bin/aish
-
-.PHONY: all clean install
+	rm -f aish
