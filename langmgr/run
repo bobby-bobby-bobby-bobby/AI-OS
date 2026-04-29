@@ -1,0 +1,194 @@
+#!/bin/sh
+# langmgr — run: Universal file runner
+# Auto-detects language from file extension and runs it.
+
+set -e
+
+REGISTRY_FILE="${LANGMGR_REGISTRY:-/usr/share/langmgr/registry.yaml}"
+[ -f "${REGISTRY_FILE}" ] || REGISTRY_FILE="$(dirname "$0")/registry.yaml"
+
+RUN_VERSION="0.1.0"
+
+usage() {
+    cat <<EOF
+run v${RUN_VERSION} — AI-OS Universal Runner
+
+Usage: run [options] <file> [args...]
+       run --lang <language> <file> [args...]
+
+Options:
+  --lang <name>   Force a specific language
+  --list-langs    List all languages with run support
+  --repl <lang>   Start interactive REPL for language
+  -h, --help      Show this help
+
+Examples:
+  run hello.py
+  run main.rs
+  run script.sh
+  run hello.bf
+  run --lang python myscript
+  run --repl python
+
+EOF
+}
+
+# Get the run command for a language from the registry
+get_run_cmd() {
+    local lang="$1"
+    awk -v lang="  ${lang}:" '
+        /^  [a-z_]+:/ { in_lang = ($0 ~ lang) }
+        in_lang && /^    run:/ { gsub(/.*run: *"?/, ""); gsub(/"$/, ""); print; exit }
+    ' "${REGISTRY_FILE}"
+}
+
+# Detect language by file extension
+detect_lang() {
+    local file="$1"
+    local ext="${file##*.}"
+    ext=".${ext}"
+
+    # Special case: no extension or same as filename
+    [ "${file}" = "${ext}" ] || [ -z "${ext}" ] && ext=""
+
+    # Check shebang for extensionless files
+    if [ -z "${ext}" ] || [ "${ext}" = "." ]; then
+        local shebang
+        shebang="$(head -1 "${file}" 2>/dev/null)"
+        case "${shebang}" in
+            *python*) echo "python"; return ;;
+            *ruby*)   echo "ruby"; return ;;
+            *node*)   echo "nodejs"; return ;;
+            *perl*)   echo "perl"; return ;;
+            *bash*|*sh*) echo "bash"; return ;;
+            *lua*)    echo "lua"; return ;;
+        esac
+        echo ""
+        return
+    fi
+
+    # Extension mapping (must match registry)
+    case "${ext}" in
+        .py|.pyw)         echo "python" ;;
+        .rs)              echo "rust" ;;
+        .go)              echo "go" ;;
+        .java)            echo "java" ;;
+        .cs|.csx)         echo "csharp" ;;
+        .js|.mjs)         echo "nodejs" ;;
+        .ts)              echo "typescript" ;;
+        .rb)              echo "ruby" ;;
+        .php)             echo "php" ;;
+        .hs|.lhs)         echo "haskell" ;;
+        .ml|.mli)         echo "ocaml" ;;
+        .erl)             echo "erlang" ;;
+        .ex|.exs)         echo "elixir" ;;
+        .scm|.ss)         echo "scheme" ;;
+        .rkt)             echo "racket" ;;
+        .clj|.cljs)       echo "clojure" ;;
+        .lisp|.lsp)       echo "lisp" ;;
+        .pl|.pm)          echo "perl" ;;
+        .tcl)             echo "tcl" ;;
+        .lua)             echo "lua" ;;
+        .r|.R)            echo "r" ;;
+        .jl)              echo "julia" ;;
+        .nim)             echo "nim" ;;
+        .cr)              echo "crystal" ;;
+        .v)               echo "vlang" ;;
+        .zig)             echo "zig" ;;
+        .swift)           echo "swift" ;;
+        .kt|.kts)         echo "kotlin" ;;
+        .f|.f90|.f95|.for) echo "fortran" ;;
+        .cob|.cbl|.cobol) echo "cobol" ;;
+        .pas|.pp)         echo "pascal" ;;
+        .adb|.ads)        echo "ada" ;;
+        .c)               echo "c" ;;
+        .cpp|.cc|.cxx)    echo "cpp" ;;
+        .bf|.b)
+            # Could be brainfuck or gwbasic; prefer brainfuck for .bf
+            echo "brainfuck"
+            ;;
+        .ws)              echo "whitespace" ;;
+        .wasm)            echo "wasm" ;;
+        .sh|.bash)        echo "bash" ;;
+        .bas)             echo "basic" ;;  # or qbasic
+        *)                echo "" ;;
+    esac
+}
+
+run_repl() {
+    local lang="$1"
+    local repl_cmd
+    repl_cmd="$(awk -v lang="  ${lang}:" '
+        /^  [a-z_]+:/ { in_lang = ($0 ~ lang) }
+        in_lang && /^    repl:/ { gsub(/.*repl: *"?/, ""); gsub(/"$/, ""); print; exit }
+    ' "${REGISTRY_FILE}")"
+
+    if [ -z "${repl_cmd}" ] || [ "${repl_cmd}" = "null" ]; then
+        echo "run: no REPL available for ${lang}" >&2
+        exit 1
+    fi
+
+    echo "Starting ${lang} REPL (${repl_cmd})..."
+    exec ${repl_cmd}
+}
+
+# Parse options
+FORCED_LANG=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --lang)  FORCED_LANG="$2"; shift 2 ;;
+        --repl)  run_repl "${2:-python}"; exit ;;
+        -h|--help) usage; exit 0 ;;
+        --list-langs)
+            grep -E "^    run:" "${REGISTRY_FILE}" 2>/dev/null | head -40
+            exit 0
+            ;;
+        --) shift; break ;;
+        -*) echo "run: unknown option: $1" >&2; exit 1 ;;
+        *)  break ;;
+    esac
+done
+
+if [ $# -eq 0 ]; then
+    usage
+    exit 1
+fi
+
+FILE="$1"
+shift
+
+if [ ! -f "${FILE}" ]; then
+    echo "run: file not found: ${FILE}" >&2
+    exit 1
+fi
+
+# Determine language
+LANG_NAME="${FORCED_LANG}"
+if [ -z "${LANG_NAME}" ]; then
+    LANG_NAME="$(detect_lang "${FILE}")"
+fi
+
+if [ -z "${LANG_NAME}" ]; then
+    echo "run: cannot determine language for: ${FILE}" >&2
+    echo "  Hint: use --lang to specify: run --lang python ${FILE}" >&2
+    exit 1
+fi
+
+# Get run command template
+RUN_CMD="$(get_run_cmd "${LANG_NAME}")"
+if [ -z "${RUN_CMD}" ]; then
+    echo "run: no run command for language: ${LANG_NAME}" >&2
+    echo "  Try: lang install ${LANG_NAME}" >&2
+    exit 1
+fi
+
+# Substitute placeholders
+BASENAME="$(basename "${FILE%.*}")"
+RUN_CMD="${RUN_CMD//\{file\}/${FILE}}"
+RUN_CMD="${RUN_CMD//\{basename\}/${BASENAME}}"
+RUN_CMD="${RUN_CMD//\{classname\}/${BASENAME}}"
+
+echo "run: ${LANG_NAME} → ${RUN_CMD} $*" >&2
+
+# Execute
+eval "${RUN_CMD}" "$@"

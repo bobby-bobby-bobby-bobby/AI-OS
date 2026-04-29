@@ -1,0 +1,121 @@
+#!/bin/sh
+# UPCL — Universal Package Compatibility Layer
+# Main dispatcher for foreign package formats.
+
+set -e
+
+UPCL_VERSION="0.1.0"
+HANDLERS_DIR="$(dirname "$0")/handlers"
+COMPAT_DB="/var/lib/upcl"
+
+usage() {
+    cat <<EOF
+UPCL v${UPCL_VERSION} — Universal Package Compatibility Layer
+
+Usage: upcl <command> [options] <package>
+
+Commands:
+  install <pkg>      Install a package (auto-detects format)
+  remove  <name>     Remove a UPCL-installed package
+  list               List UPCL-installed packages
+  info    <pkg>      Show package info
+  sandbox <pkg>      Install in sandbox mode (Firejail/Bubblewrap)
+  kali    <tool>     Install a Kali Linux tool
+  fedora  <pkg>      Install a Fedora package
+  mx      <tool>     Install an MX Tools tool
+
+Supported formats:
+  .deb  .rpm  .pkg.tar.zst  .AppImage  flatpak:<id>  snap:<id>  nix:<attr>
+
+Options:
+  --sandbox          Force sandboxed installation
+  --no-deps          Skip dependency resolution
+  -v, --verbose      Verbose output
+  -h, --help         Show this help
+
+EOF
+}
+
+# Auto-detect package format
+detect_format() {
+    local pkg="$1"
+    case "$pkg" in
+        *.deb)         echo "deb" ;;
+        *.rpm)         echo "rpm" ;;
+        *.pkg.tar.zst|*.pkg.tar.xz) echo "pkgbuild" ;;
+        *.AppImage)    echo "appimage" ;;
+        flatpak:*)     echo "flatpak" ;;
+        snap:*)        echo "snap" ;;
+        nix:*)         echo "nix" ;;
+        kali:*)        echo "kali" ;;
+        fedora:*)      echo "fedora" ;;
+        mx:*)          echo "mx" ;;
+        *)
+            # Try by file magic
+            if file "$pkg" 2>/dev/null | grep -q "Debian"; then
+                echo "deb"
+            elif file "$pkg" 2>/dev/null | grep -q "RPM"; then
+                echo "rpm"
+            elif [ -x "$pkg" ]; then
+                echo "appimage"
+            else
+                echo "unknown"
+            fi
+            ;;
+    esac
+}
+
+do_install() {
+    local pkg="$1"
+    local format
+    format="$(detect_format "$pkg")"
+
+    echo "UPCL: detected format: ${format}"
+
+    case "${format}" in
+        deb)       sh "${HANDLERS_DIR}/deb.sh" install "$pkg" ;;
+        rpm)       sh "${HANDLERS_DIR}/rpm.sh" install "$pkg" ;;
+        pkgbuild)  sh "${HANDLERS_DIR}/pkgbuild.sh" install "$pkg" ;;
+        appimage)  sh "${HANDLERS_DIR}/appimage.sh" install "$pkg" ;;
+        flatpak)   sh "${HANDLERS_DIR}/flatpak.sh" install "${pkg#flatpak:}" ;;
+        snap)      sh "${HANDLERS_DIR}/snap.sh" install "${pkg#snap:}" ;;
+        nix)       sh "${HANDLERS_DIR}/nix.sh" install "${pkg#nix:}" ;;
+        kali)      sh "${HANDLERS_DIR}/kali.sh" install "${pkg#kali:}" ;;
+        fedora)    sh "${HANDLERS_DIR}/fedora.sh" install "${pkg#fedora:}" ;;
+        mx)        sh "${HANDLERS_DIR}/mx.sh" install "${pkg#mx:}" ;;
+        unknown)
+            echo "UPCL: cannot determine format for: $pkg" >&2
+            echo "  Supported: .deb .rpm .AppImage flatpak: snap: nix: kali: fedora: mx:" >&2
+            exit 1
+            ;;
+    esac
+}
+
+# Parse arguments
+SANDBOX=0
+VERBOSE=0
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --sandbox)  SANDBOX=1; shift ;;
+        -v|--verbose) VERBOSE=1; shift ;;
+        -h|--help)  usage; exit 0 ;;
+        --)         shift; break ;;
+        -*)         echo "upcl: unknown option: $1" >&2; exit 1 ;;
+        *)          break ;;
+    esac
+done
+
+COMMAND="$1"
+shift || true
+
+case "$COMMAND" in
+    install)  do_install "$1" ;;
+    remove)   echo "TODO: remove ${1}" ;;
+    list)     cat "${COMPAT_DB}/installed" 2>/dev/null || echo "Nothing installed via UPCL." ;;
+    kali)     sh "${HANDLERS_DIR}/kali.sh" install "$1" ;;
+    fedora)   sh "${HANDLERS_DIR}/fedora.sh" install "$1" ;;
+    mx)       sh "${HANDLERS_DIR}/mx.sh" install "$1" ;;
+    ""|help)  usage ;;
+    *)        echo "upcl: unknown command: $COMMAND" >&2; exit 1 ;;
+esac

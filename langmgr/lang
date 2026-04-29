@@ -1,0 +1,178 @@
+#!/bin/sh
+# langmgr — lang CLI
+# Install, manage, and query language runtimes.
+
+set -e
+
+LANG_VERSION="0.1.0"
+REGISTRY_FILE="${LANGMGR_REGISTRY:-/usr/share/langmgr/registry.yaml}"
+[ -f "${REGISTRY_FILE}" ] || REGISTRY_FILE="$(dirname "$0")/registry.yaml"
+INSTALLED_FILE="/var/lib/langmgr/installed"
+HANDLERS_DIR="$(dirname "$0")/handlers"
+
+usage() {
+    cat <<EOF
+lang v${LANG_VERSION} — AI-OS Language Runtime Manager
+
+Usage: lang <command> [language]
+
+Commands:
+  install <language>    Install a language runtime
+  remove  <language>    Remove a language runtime
+  list                  List all supported languages
+  list --installed      List installed languages
+  info    <language>    Show language information
+  update                Update language registry
+  search  <query>       Search for a language
+
+Examples:
+  lang install python
+  lang install rust
+  lang install brainfuck
+  lang list
+  lang list --installed
+  lang info haskell
+
+EOF
+}
+
+# Simple YAML field extractor (no full YAML parser needed for this format)
+yaml_get() {
+    local file="$1"
+    local lang="$2"
+    local field="$3"
+    # Find the language block and extract the field
+    awk -v lang="${lang}:" -v field="  ${field}:" '
+        /^  [a-z]/ { in_lang = ($0 ~ "^  " lang) }
+        in_lang && $0 ~ field { gsub(/.*: */, ""); gsub(/"/, ""); print; exit }
+    ' "${file}"
+}
+
+lang_list_all() {
+    echo "Supported Languages:"
+    echo ""
+    local prev_cat=""
+    grep -E '^  [a-z_]+:$' "${REGISTRY_FILE}" 2>/dev/null | \
+    sed 's/://; s/^  //' | while read -r name; do
+        local cat
+        cat="$(yaml_get "${REGISTRY_FILE}" "${name}" "category")"
+        if [ "${cat}" != "${prev_cat}" ]; then
+            printf "\n  [%s]\n" "${cat}"
+            prev_cat="${cat}"
+        fi
+        local installed_mark=""
+        grep -q "^${name}$" "${INSTALLED_FILE}" 2>/dev/null && installed_mark=" *"
+        printf "    %-20s  %s%s\n" "${name}" "$(yaml_get "${REGISTRY_FILE}" "${name}" "name")" "${installed_mark}"
+    done
+    echo ""
+    echo "  (* = installed)"
+}
+
+lang_list_installed() {
+    if [ ! -f "${INSTALLED_FILE}" ]; then
+        echo "No languages installed via langmgr."
+        return
+    fi
+    echo "Installed Languages:"
+    while IFS= read -r lang; do
+        printf "  %-20s  %s\n" "${lang}" "$(yaml_get "${REGISTRY_FILE}" "${lang}" "name")"
+    done < "${INSTALLED_FILE}"
+}
+
+lang_info() {
+    local lang="$1"
+    echo "=== $(yaml_get "${REGISTRY_FILE}" "${lang}" "name") ==="
+    echo "ID:       ${lang}"
+    echo "Version:  $(yaml_get "${REGISTRY_FILE}" "${lang}" "version")"
+    echo "Category: $(yaml_get "${REGISTRY_FILE}" "${lang}" "category")"
+    echo "Run:      $(yaml_get "${REGISTRY_FILE}" "${lang}" "run")"
+    local doc
+    doc="$(yaml_get "${REGISTRY_FILE}" "${lang}" "doc")"
+    [ -n "${doc}" ] && echo "Docs:     ${doc}"
+    if grep -q "^${lang}$" "${INSTALLED_FILE}" 2>/dev/null; then
+        echo "Status:   INSTALLED"
+    else
+        echo "Status:   not installed"
+    fi
+}
+
+lang_install() {
+    local lang="$1"
+
+    if ! grep -q "^  ${lang}:" "${REGISTRY_FILE}" 2>/dev/null; then
+        echo "lang: unknown language: ${lang}" >&2
+        echo "  Run 'lang list' to see available languages" >&2
+        exit 1
+    fi
+
+    local method
+    method="$(yaml_get "${REGISTRY_FILE}" "${lang}" "method")"
+    local category
+    category="$(yaml_get "${REGISTRY_FILE}" "${lang}" "category")"
+
+    echo "Installing: $(yaml_get "${REGISTRY_FILE}" "${lang}" "name") (${lang})"
+
+    case "${method}" in
+        package)
+            sh "${HANDLERS_DIR}/modern.sh" install-packages "${lang}" "${REGISTRY_FILE}"
+            ;;
+        script)
+            sh "${HANDLERS_DIR}/modern.sh" install-script "${lang}" "${REGISTRY_FILE}"
+            ;;
+        npm)
+            sh "${HANDLERS_DIR}/modern.sh" install-npm "${lang}" "${REGISTRY_FILE}"
+            ;;
+        dosbox)
+            sh "${HANDLERS_DIR}/retro.sh" install "${lang}" "${REGISTRY_FILE}"
+            ;;
+        build)
+            sh "${HANDLERS_DIR}/modern.sh" install-build "${lang}" "${REGISTRY_FILE}"
+            ;;
+        *)
+            echo "lang: unsupported install method: ${method}" >&2
+            exit 1
+            ;;
+    esac
+
+    # Record installation
+    mkdir -p /var/lib/langmgr
+    grep -q "^${lang}$" "${INSTALLED_FILE}" 2>/dev/null || echo "${lang}" >> "${INSTALLED_FILE}"
+    echo "Installed: ${lang}"
+}
+
+lang_remove() {
+    local lang="$1"
+    echo "Removing: ${lang}"
+    # TODO: call appropriate uninstall handler
+    sed -i "/^${lang}$/d" "${INSTALLED_FILE}" 2>/dev/null || true
+    echo "Removed: ${lang}"
+}
+
+lang_search() {
+    local query="$1"
+    grep -i "${query}" "${REGISTRY_FILE}" 2>/dev/null | \
+        grep -E "^  [a-z_]+:$|name:|category:" | head -30
+}
+
+# Parse args
+LIST_INSTALLED=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --installed) LIST_INSTALLED=1; shift ;;
+        *) break ;;
+    esac
+done
+
+COMMAND="${1:-help}"
+shift || true
+
+case "${COMMAND}" in
+    install)  lang_install "$1" ;;
+    remove)   lang_remove "$1" ;;
+    list)     [ "${LIST_INSTALLED}" = "1" ] && lang_list_installed || lang_list_all ;;
+    info)     lang_info "$1" ;;
+    search)   lang_search "$*" ;;
+    update)   echo "Registry is up to date (managed by aipkg)." ;;
+    help|"")  usage ;;
+    *)        echo "lang: unknown command: ${COMMAND}" >&2; usage; exit 1 ;;
+esac

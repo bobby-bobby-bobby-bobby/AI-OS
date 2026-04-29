@@ -1,0 +1,528 @@
+# AI-OS Language Runtime Registry
+# Format: each entry defines how to install and run a language
+
+version: "1"
+updated: "2024-01-01"
+
+languages:
+
+  # === Modern Languages ===
+
+  python:
+    name: Python
+    version: "3.11"
+    category: modern
+    extensions: [.py, .pyw]
+    install:
+      method: package
+      packages: [python3, python3-pip]
+    run: "python3 {file}"
+    repl: "python3"
+    doc: "https://python.org"
+
+  rust:
+    name: Rust
+    version: "stable"
+    category: modern
+    extensions: [.rs]
+    install:
+      method: script
+      url: "https://sh.rustup.rs"
+      cmd: "curl -fsSL https://sh.rustup.rs | sh -s -- -y"
+    run: "rustc {file} -o /tmp/rust_out && /tmp/rust_out"
+    repl: "evcxr"
+    doc: "https://rust-lang.org"
+
+  go:
+    name: Go
+    version: "1.21"
+    category: modern
+    extensions: [.go]
+    install:
+      method: package
+      packages: [golang]
+    run: "go run {file}"
+    repl: "gore"
+    doc: "https://go.dev"
+
+  java:
+    name: Java (OpenJDK)
+    version: "21"
+    category: modern
+    extensions: [.java]
+    install:
+      method: package
+      packages: [openjdk-21-jdk]
+    run: "javac {file} && java {classname}"
+    repl: "jshell"
+    doc: "https://openjdk.org"
+
+  csharp:
+    name: C# (.NET)
+    version: "8"
+    category: modern
+    extensions: [.cs, .csx]
+    install:
+      method: package
+      packages: [dotnet-sdk-8]
+    run: "dotnet script {file}"
+    repl: "dotnet-script"
+    doc: "https://dotnet.microsoft.com"
+
+  nodejs:
+    name: Node.js
+    version: "20"
+    category: modern
+    extensions: [.js, .mjs, .cjs]
+    install:
+      method: package
+      packages: [nodejs, npm]
+    run: "node {file}"
+    repl: "node"
+    doc: "https://nodejs.org"
+
+  typescript:
+    name: TypeScript
+    version: "5"
+    category: modern
+    extensions: [.ts]
+    install:
+      method: npm
+      packages: [typescript, ts-node]
+    run: "ts-node {file}"
+    repl: "ts-node"
+
+  ruby:
+    name: Ruby
+    version: "3.2"
+    category: modern
+    extensions: [.rb]
+    install:
+      method: package
+      packages: [ruby]
+    run: "ruby {file}"
+    repl: "irb"
+
+  php:
+    name: PHP
+    version: "8.2"
+    category: modern
+    extensions: [.php]
+    install:
+      method: package
+      packages: [php-cli]
+    run: "php {file}"
+    repl: "php -a"
+
+  swift:
+    name: Swift
+    version: "5.9"
+    category: modern
+    extensions: [.swift]
+    install:
+      method: package
+      packages: [swift]
+    run: "swift {file}"
+    repl: "swift repl"
+
+  kotlin:
+    name: Kotlin
+    version: "1.9"
+    category: modern
+    extensions: [.kt, .kts]
+    install:
+      method: package
+      packages: [kotlin]
+    run: "kotlin {file}"
+    repl: "kotlinc"
+
+  # === Systems Languages ===
+
+  c:
+    name: C
+    version: "C11"
+    category: systems
+    extensions: [.c]
+    install:
+      method: package
+      packages: [gcc, libc6-dev]
+    run: "gcc {file} -o /tmp/c_out && /tmp/c_out"
+    repl: null
+
+  cpp:
+    name: C++
+    version: "C++17"
+    category: systems
+    extensions: [.cpp, .cc, .cxx]
+    install:
+      method: package
+      packages: [g++]
+    run: "g++ {file} -o /tmp/cpp_out && /tmp/cpp_out"
+
+  zig:
+    name: Zig
+    version: "0.11"
+    category: systems
+    extensions: [.zig]
+    install:
+      method: package
+      packages: [zig]
+    run: "zig run {file}"
+    repl: null
+
+  # === Academic Languages ===
+
+  haskell:
+    name: Haskell (GHC)
+    version: "9.4"
+    category: academic
+    extensions: [.hs, .lhs]
+    install:
+      method: package
+      packages: [ghc, runghc]
+    run: "runghc {file}"
+    repl: "ghci"
+
+  ocaml:
+    name: OCaml
+    version: "4.14"
+    category: academic
+    extensions: [.ml, .mli]
+    install:
+      method: package
+      packages: [ocaml]
+    run: "ocaml {file}"
+    repl: "ocaml"
+
+  erlang:
+    name: Erlang
+    version: "25"
+    category: academic
+    extensions: [.erl]
+    install:
+      method: package
+      packages: [erlang]
+    run: "escript {file}"
+    repl: "erl"
+
+  elixir:
+    name: Elixir
+    version: "1.15"
+    category: academic
+    extensions: [.ex, .exs]
+    install:
+      method: package
+      packages: [elixir]
+    run: "elixir {file}"
+    repl: "iex"
+
+  prolog:
+    name: Prolog (SWI-Prolog)
+    version: "9"
+    category: academic
+    extensions: [.pl, .pro]
+    install:
+      method: package
+      packages: [swi-prolog]
+    run: "swipl -g halt -s {file}"
+    repl: "swipl"
+
+  scheme:
+    name: Scheme (Guile)
+    version: "3.0"
+    category: academic
+    extensions: [.scm, .ss]
+    install:
+      method: package
+      packages: [guile-3.0]
+    run: "guile {file}"
+    repl: "guile"
+
+  racket:
+    name: Racket
+    version: "8.10"
+    category: academic
+    extensions: [.rkt]
+    install:
+      method: package
+      packages: [racket]
+    run: "racket {file}"
+    repl: "racket"
+
+  clojure:
+    name: Clojure
+    version: "1.11"
+    category: academic
+    extensions: [.clj, .cljs]
+    install:
+      method: package
+      packages: [clojure]
+    run: "clojure {file}"
+    repl: "clojure"
+
+  # === Legacy Languages ===
+
+  fortran:
+    name: Fortran (gfortran)
+    version: "95/2003/2008"
+    category: legacy
+    extensions: [.f, .f90, .f95, .for]
+    install:
+      method: package
+      packages: [gfortran]
+    run: "gfortran {file} -o /tmp/fortran_out && /tmp/fortran_out"
+
+  cobol:
+    name: COBOL (GnuCOBOL)
+    version: "3.1"
+    category: legacy
+    extensions: [.cob, .cbl, .cobol]
+    install:
+      method: package
+      packages: [gnucobol]
+    run: "cobc -x {file} -o /tmp/cobol_out && /tmp/cobol_out"
+
+  pascal:
+    name: Pascal (Free Pascal)
+    version: "3.2"
+    category: legacy
+    extensions: [.pas, .pp]
+    install:
+      method: package
+      packages: [fpc]
+    run: "fpc {file} -o /tmp/pascal_out && /tmp/pascal_out"
+
+  ada:
+    name: Ada (GNAT)
+    version: "2012"
+    category: legacy
+    extensions: [.adb, .ads]
+    install:
+      method: package
+      packages: [gnat]
+    run: "gnatmake {file} && ./{basename}"
+
+  basic:
+    name: BASIC (FreeBASIC)
+    version: "1.10"
+    category: legacy
+    extensions: [.bas]
+    install:
+      method: package
+      packages: [freebasic]
+    run: "fbc {file} -o /tmp/basic_out && /tmp/basic_out"
+    note: "For QBasic/GW-BASIC use: lang install qbasic (DOSBox-based)"
+
+  lisp:
+    name: Common Lisp (SBCL)
+    version: "2.3"
+    category: legacy
+    extensions: [.lisp, .lsp]
+    install:
+      method: package
+      packages: [sbcl]
+    run: "sbcl --script {file}"
+    repl: "sbcl"
+
+  perl:
+    name: Perl
+    version: "5.36"
+    category: legacy
+    extensions: [.pl, .pm]
+    install:
+      method: package
+      packages: [perl]
+    run: "perl {file}"
+    repl: "perl -de0"
+
+  tcl:
+    name: Tcl
+    version: "8.6"
+    category: legacy
+    extensions: [.tcl]
+    install:
+      method: package
+      packages: [tcl]
+    run: "tclsh {file}"
+    repl: "tclsh"
+
+  # === Retro Languages (DOSBox-based) ===
+
+  qbasic:
+    name: QBasic
+    version: "1.1"
+    category: retro
+    extensions: [.bas]
+    install:
+      method: dosbox
+      source: "qbasic"
+    run: "dosbox -c 'QBASIC /RUN {file}' -c 'EXIT'"
+    note: "Requires DOSBox"
+
+  gwbasic:
+    name: GW-BASIC
+    version: "3.23"
+    category: retro
+    extensions: [.bas]
+    install:
+      method: dosbox
+      source: "gwbasic"
+    run: "dosbox -c 'GWBASIC {file}' -c 'EXIT'"
+
+  turbo_pascal:
+    name: Turbo Pascal
+    version: "7.0"
+    category: retro
+    extensions: [.pas]
+    install:
+      method: dosbox
+      source: "turbo_pascal"
+    run: "dosbox -c 'TPC {file}'"
+
+  # === Esoteric Languages ===
+
+  brainfuck:
+    name: Brainfuck
+    version: "1.0"
+    category: esoteric
+    extensions: [.bf, .b]
+    install:
+      method: build
+      source: "https://github.com/fabianishere/brainfuck"
+    run: "brainfuck {file}"
+
+  befunge:
+    name: Befunge-93/98
+    version: "1.0"
+    category: esoteric
+    extensions: [.bf93, .b93, .befunge]
+    install:
+      method: package
+      packages: [cfunge]
+    run: "cfunge {file}"
+
+  whitespace:
+    name: Whitespace
+    version: "0.3"
+    category: esoteric
+    extensions: [.ws]
+    install:
+      method: build
+      source: "https://github.com/wspace/nebula"
+    run: "whitespace {file}"
+
+  piet:
+    name: Piet
+    version: "1.0"
+    category: esoteric
+    extensions: [.png, .gif]
+    install:
+      method: package
+      packages: [npiet]
+    run: "npiet {file}"
+
+  malbolge:
+    name: Malbolge
+    version: "1.0"
+    category: esoteric
+    extensions: [.mal]
+    install:
+      method: build
+      source: "local"
+    run: "malbolge {file}"
+
+  # === WebAssembly / VM-based ===
+
+  wasm:
+    name: WebAssembly
+    version: "1.0"
+    category: vm-based
+    extensions: [.wasm, .wat]
+    install:
+      method: package
+      packages: [wabt, wasmer]
+    run: "wasmer {file}"
+
+  dotnet:
+    name: .NET (C#/F#/VB)
+    version: "8"
+    category: vm-based
+    extensions: [.dll]
+    install:
+      method: package
+      packages: [dotnet-runtime-8]
+    run: "dotnet {file}"
+
+  lua:
+    name: Lua
+    version: "5.4"
+    category: modern
+    extensions: [.lua]
+    install:
+      method: package
+      packages: [lua5.4]
+    run: "lua5.4 {file}"
+    repl: "lua5.4"
+
+  r:
+    name: R
+    version: "4.3"
+    category: academic
+    extensions: [.r, .R]
+    install:
+      method: package
+      packages: [r-base]
+    run: "Rscript {file}"
+    repl: "R"
+
+  julia:
+    name: Julia
+    version: "1.9"
+    category: modern
+    extensions: [.jl]
+    install:
+      method: script
+      cmd: "curl -fsSL https://install.julialang.org | sh"
+    run: "julia {file}"
+    repl: "julia"
+
+  nim:
+    name: Nim
+    version: "2.0"
+    category: modern
+    extensions: [.nim]
+    install:
+      method: script
+      cmd: "curl -fsSL https://nim-lang.org/choosenim/init.sh | sh"
+    run: "nim r {file}"
+
+  crystal:
+    name: Crystal
+    version: "1.10"
+    category: modern
+    extensions: [.cr]
+    install:
+      method: package
+      packages: [crystal]
+    run: "crystal run {file}"
+
+  vlang:
+    name: V
+    version: "0.4"
+    category: modern
+    extensions: [.v]
+    install:
+      method: build
+      source: "https://github.com/vlang/v"
+    run: "v run {file}"
+
+  bash:
+    name: Bash
+    version: "5"
+    category: modern
+    extensions: [.sh, .bash]
+    install:
+      method: package
+      packages: [bash]
+    run: "bash {file}"
+    repl: "bash"
