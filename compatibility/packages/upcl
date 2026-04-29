@@ -1,13 +1,53 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cmd="${1:-}"
+ROOT=${UPCL_ROOT:-/}
+STATE_DIR=${UPCL_STATE_DIR:-/var/lib/upcl}
+HANDLERS_DIR="$(cd "$(dirname "$0")" && pwd)/handlers"
+mkdir -p "$STATE_DIR"
+
+usage(){ cat <<USAGE
+usage: upcl <install|remove|list|detect> <package>
+examples:
+  upcl install ./pkg.deb
+  upcl install flatpak:org.mozilla.firefox
+  upcl list
+USAGE
+}
+
+detect_format(){
+  local target=${1:-}
+  case "$target" in
+    *.deb) echo deb;; *.rpm) echo rpm;; *.pkg.tar.*) echo pkgbuild;;
+    *.AppImage) echo appimage;; flatpak:*) echo flatpak;; snap:*) echo snap;; nix:*) echo nix;;
+    kali:*) echo kali;; fedora:*) echo fedora;; opensuse:*) echo opensuse;; mx:*) echo mx;;
+    *) echo unknown;;
+  esac
+}
+
+record_install(){ printf '%s|%s|%s\n' "$1" "$2" "$(date -u +%FT%TZ)" >> "$STATE_DIR/installed.db"; }
+
+cmd=${1:-}; arg=${2:-}
 case "$cmd" in
-  deb|rpm|pkgbuild|appimage|flatpak|snap|nix)
-    echo "TODO: dispatch to handler: $cmd"
+  install)
+    [[ -n "$arg" ]] || { usage; exit 1; }
+    fmt=$(detect_format "$arg")
+    [[ "$fmt" != unknown ]] || { echo "unsupported package format: $arg" >&2; exit 2; }
+    handler="$HANDLERS_DIR/$fmt.sh"
+    [[ -x "$handler" ]] || { echo "missing handler: $handler" >&2; exit 3; }
+    "$handler" install "$arg" "$ROOT"
+    record_install "$arg" "$fmt"
     ;;
-  *)
-    echo "usage: upcl {deb|rpm|pkgbuild|appimage|flatpak|snap|nix}" >&2
-    exit 1
+  remove)
+    [[ -n "$arg" ]] || { usage; exit 1; }
+    sed -i "\|^$arg|d" "$STATE_DIR/installed.db" 2>/dev/null || true
     ;;
+  list)
+    cat "$STATE_DIR/installed.db" 2>/dev/null || true
+    ;;
+  detect)
+    [[ -n "$arg" ]] || { usage; exit 1; }
+    detect_format "$arg"
+    ;;
+  *) usage; exit 1;;
 esac

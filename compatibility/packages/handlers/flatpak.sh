@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-echo "TODO: implement handler ${0##*/}"
+op=${1:?}; arg=${2:?}
+case "$op" in
+  install) echo "integration target: $arg" ;;
+  *) exit 1 ;;
+esac
