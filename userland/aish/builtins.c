@@ -27,4 +27,10 @@ int builtin_pwd(char **argv,int argc){(void)argv;(void)argc;char b[512]; if(getc
 int builtin_jobs(char **a,int c){(void)a;(void)c; puts("jobs stub"); return 0;}
 int builtin_fg(char **a,int c){(void)a;(void)c; puts("fg stub"); return 0;}
 int builtin_bg(char **a,int c){(void)a;(void)c; puts("bg stub"); return 0;}
-int builtin_unset(char **a,int c){(void)a;(void)c;return 0;} int builtin_alias(char **a,int c){(void)a;(void)c;return 0;} int builtin_history(char **a,int c){(void)a;(void)c;return 0;} int builtin_help(char **a,int c){(void)a;(void)c;return 0;} int builtin_echo(char **a,int c){(void)a;(void)c;return 0;} int builtin_type(char **a,int c){(void)a;(void)c;return 0;} int builtin_source(char **a,int c){(void)a;(void)c;return 0;}
+int builtin_unset(char **a, int c) { (void)a; (void)c; return 0; }
+int builtin_alias(char **a, int c) { (void)a; (void)c; return 0; }
+int builtin_history(char **a, int c) { (void)a; (void)c; return 0; }
+int builtin_help(char **a, int c) { (void)a; (void)c; return 0; }
+int builtin_echo(char **a, int c) { (void)a; (void)c; return 0; }
+int builtin_type(char **a, int c) { (void)a; (void)c; return 0; }
+int builtin_source(char **a, int c) { (void)a; (void)c; return 0; }
