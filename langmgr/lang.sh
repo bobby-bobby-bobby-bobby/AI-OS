@@ -1,3 +1,3 @@
 #!/bin/sh
 set -eu
-echo "lang installer stub: $*"
+echo "lang installer stub:" "$@"
