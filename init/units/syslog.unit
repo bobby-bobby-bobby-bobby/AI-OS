@@ -1,0 +1,12 @@
+[Unit]
+Name=syslog
+Description=System Logging Daemon
+After=mount
+
+[Service]
+Type=simple
+ExecStart=/sbin/syslogd -n -O /var/log/syslog
+Restart=on-failure
+
+[Install]
+WantedBy=default

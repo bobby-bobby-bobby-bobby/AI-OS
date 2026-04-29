@@ -1,0 +1,134 @@
+#!/bin/sh
+# aipkg — AI-OS Package Manager
+# Main CLI entry point
+
+set -e
+
+AIPKG_VERSION="0.1.0"
+AIPKG_DB="/var/lib/aipkg"
+AIPKG_CACHE="/var/cache/aipkg/packages"
+AIPKG_REPOS="/etc/aipkg/repos.conf"
+AIPKG_LIB="/usr/lib/aipkg"
+
+# Source library functions
+. "${AIPKG_LIB}/db.sh"     2>/dev/null || . "$(dirname "$0")/lib/db.sh"
+. "${AIPKG_LIB}/fetch.sh"  2>/dev/null || . "$(dirname "$0")/lib/fetch.sh"
+. "${AIPKG_LIB}/install.sh" 2>/dev/null || . "$(dirname "$0")/lib/install.sh"
+. "${AIPKG_LIB}/resolve.sh" 2>/dev/null || . "$(dirname "$0")/lib/resolve.sh"
+
+usage() {
+    cat <<EOF
+Usage: aipkg <command> [options] [package...]
+
+Commands:
+  install <pkg>     Install one or more packages
+  remove  <pkg>     Remove one or more packages
+  update            Refresh package lists from repositories
+  upgrade           Upgrade all installed packages
+  search  <query>   Search for packages
+  list              List installed packages
+  info    <pkg>     Show package information
+  clean             Clean package cache
+  verify  <pkg>     Verify package integrity
+  snapshot          Create a Btrfs snapshot before changes
+
+Options:
+  -y, --yes         Assume yes to all prompts
+  -q, --quiet       Suppress output
+  -v, --verbose     Verbose output
+  --no-deps         Skip dependency resolution
+  --dry-run         Show what would be done without doing it
+  -h, --help        Show this help
+
+Version: ${AIPKG_VERSION}
+EOF
+}
+
+# Parse global options
+ASSUME_YES=0
+QUIET=0
+VERBOSE=0
+NO_DEPS=0
+DRY_RUN=0
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -y|--yes)     ASSUME_YES=1; shift ;;
+        -q|--quiet)   QUIET=1; shift ;;
+        -v|--verbose) VERBOSE=1; shift ;;
+        --no-deps)    NO_DEPS=1; shift ;;
+        --dry-run)    DRY_RUN=1; shift ;;
+        -h|--help)    usage; exit 0 ;;
+        --)           shift; break ;;
+        -*)           echo "aipkg: unknown option: $1" >&2; exit 1 ;;
+        *)            break ;;
+    esac
+done
+
+COMMAND="$1"
+shift || true
+
+case "$COMMAND" in
+    install)
+        if [ $# -eq 0 ]; then
+            echo "aipkg: install requires at least one package name" >&2
+            exit 1
+        fi
+        for pkg in "$@"; do
+            pkg_install "$pkg"
+        done
+        ;;
+    remove|uninstall)
+        if [ $# -eq 0 ]; then
+            echo "aipkg: remove requires at least one package name" >&2
+            exit 1
+        fi
+        for pkg in "$@"; do
+            pkg_remove "$pkg"
+        done
+        ;;
+    update|refresh)
+        repo_update
+        ;;
+    upgrade)
+        pkg_upgrade
+        ;;
+    search)
+        if [ $# -eq 0 ]; then
+            echo "aipkg: search requires a query" >&2
+            exit 1
+        fi
+        pkg_search "$*"
+        ;;
+    list|ls)
+        db_list_installed
+        ;;
+    info|show)
+        if [ $# -eq 0 ]; then
+            echo "aipkg: info requires a package name" >&2
+            exit 1
+        fi
+        pkg_info "$1"
+        ;;
+    clean)
+        pkg_clean
+        ;;
+    verify)
+        if [ $# -eq 0 ]; then
+            echo "aipkg: verify requires a package name" >&2
+            exit 1
+        fi
+        pkg_verify "$1"
+        ;;
+    snapshot)
+        btrfs_snapshot
+        ;;
+    ""|help)
+        usage
+        ;;
+    *)
+        echo "aipkg: unknown command: $COMMAND" >&2
+        echo "Run 'aipkg help' for usage." >&2
+        exit 1
+        ;;
+esac
