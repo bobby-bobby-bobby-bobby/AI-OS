@@ -1,0 +1,1 @@
+# DNS adblock assets skeleton
