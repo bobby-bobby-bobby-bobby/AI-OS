@@ -1,6 +1,6 @@
 CC ?= cc
 CFLAGS ?= -Wall -Wextra -O2
-SRC := aish.c builtins.c parser.c executor.c
+SRC := aish.c builtins.c parser.c executor.c job_control.c
 all: aish
 
 aish: $(SRC)
