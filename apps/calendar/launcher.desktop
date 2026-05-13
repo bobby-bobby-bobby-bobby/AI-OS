@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=calendar
+Exec=/usr/lib/ai-os/apps/calendar/app.sh
+Type=Application
+Categories=Utility;
+X-AIOS-ThemeAware=true
+X-AIOS-LocaleAware=true
+X-AIOS-AccessibilityAware=true

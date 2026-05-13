@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=tasks
+Exec=/usr/lib/ai-os/apps/tasks/app.sh
+Type=Application
+Categories=Utility;
+X-AIOS-ThemeAware=true
+X-AIOS-LocaleAware=true
+X-AIOS-AccessibilityAware=true

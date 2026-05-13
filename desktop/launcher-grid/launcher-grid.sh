@@ -1,3 +1,4 @@
 #!/bin/sh
 set -eu
-echo "launcher grid: media, editor, files, browser-picker, ui-picker, settings"
+echo "launcher grid apps:"
+cat apps/app-registry.txt

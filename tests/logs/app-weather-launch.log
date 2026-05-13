@@ -1,0 +1,2 @@
+weather launch ui=rounded glass=off lang=C.UTF-8 font_scale=1.0 high_contrast=off args=test
+weather api stub endpoint
