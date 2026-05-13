@@ -1,2 +1,2 @@
 firstboot config written: /etc/firstboot.conf
-install complete root=/tmp/aios-install-root user=tester snapshot=snap-1778679664
+install complete root=/tmp/aios-install-root user=tester snapshot=snap-1778681461

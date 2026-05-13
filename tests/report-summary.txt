@@ -1,0 +1,8 @@
+PASS tests/tests-time.sh
+PASS tests/tests-locale.sh
+PASS tests/tests-accessibility.sh
+PASS tests/tests-installer.sh
+PASS tests/tests-network.sh
+PASS tests/tests-hardware-hooks.sh
+FAIL tests/boot-smoke.sh
+CRITICAL FAIL

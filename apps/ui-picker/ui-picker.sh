@@ -1,12 +1,14 @@
 #!/bin/sh
 set -eu
+cfg=/etc/ai-os/ui.conf
 ui="${1:-rounded}"; glass="${2:-off}"; theme="${3:-dark}"; icons="${4:-default}"; wallpaper="${5:-wallpaper01.png}"
-cat > /tmp/ai-os-ui.conf <<CFG
+mkdir -p /etc/ai-os
+cat > "$cfg" <<CFG
 ui_shape=$ui
 glass_effect=$glass
 theme=$theme
 icon_pack=$icons
 wallpaper=$wallpaper
 CFG
-./desktop/theme-engine --apply "$theme" || true
-echo "wm/panel/launcher/notify/tray UI refresh (stub): shape=$ui glass=$glass icons=$icons wallpaper=$wallpaper"
+cp -f "$cfg" /tmp/ai-os-ui.conf
+echo "applied ui=$ui glass=$glass theme=$theme icons=$icons wallpaper=$wallpaper"

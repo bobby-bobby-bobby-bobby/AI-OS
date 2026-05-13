@@ -14,14 +14,26 @@ mkdir -p "$ISO_ROOT/boot/grub"
 mkdir -p "$ISO_ROOT/boot/modules"
 [ -d "$AIOS_ROOT/kernel/modules" ] && cp -a "$AIOS_ROOT/kernel/modules/." "$ISO_ROOT/boot/modules/" || true
 
-cat > "$ISO_ROOT/boot/grub/grub.cfg" <<GRUB
+cat > "$ISO_ROOT/boot/grub/grub.cfg" <<'GRUB'
 set timeout=3
 set default=0
+
 menuentry "AI-OS First Boot" {
-  linux /boot/vmlinuz console=ttyS0 init=/sbin/init
+  linux /boot/vmlinuz console=ttyS0,115200n8 init=/sbin/init
+  initrd /boot/initramfs.img
+}
+
+menuentry "AI-OS Installer" {
+  linux /boot/vmlinuz console=ttyS0,115200n8 init=/usr/lib/ai-os/installer/install.sh
+  initrd /boot/initramfs.img
+}
+
+menuentry "AI-OS Rescue" {
+  linux /boot/vmlinuz console=ttyS0,115200n8 init=/bin/sh
   initrd /boot/initramfs.img
 }
 GRUB
+
 mkdir -p "$ISO_ROOT/boot/firstboot"
 cp -f "$PROJECT_ROOT/installer/firstboot-wizard.sh" "$ISO_ROOT/boot/firstboot/" 2>/dev/null || true
 cp -f "$PROJECT_ROOT/apps/browser-picker/browser-picker.sh" "$ISO_ROOT/boot/firstboot/" 2>/dev/null || true
