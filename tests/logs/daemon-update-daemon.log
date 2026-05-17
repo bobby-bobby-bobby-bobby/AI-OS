@@ -1,0 +1,4 @@
+update-daemon: start
+update-daemon: ping
+update-daemon: status
+update-daemon: stop

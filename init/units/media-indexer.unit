@@ -1,0 +1,8 @@
+[Unit]
+Name=media-indexer
+Description=AI-OS media-indexer
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/media-indexer.sh
+Restart=on-failure

@@ -1,0 +1,4 @@
+session-manager: start
+session-manager: ping
+session-manager: status
+session-manager: stop

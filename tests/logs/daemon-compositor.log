@@ -1,0 +1,4 @@
+compositor: start
+compositor: ping
+compositor: status
+compositor: stop

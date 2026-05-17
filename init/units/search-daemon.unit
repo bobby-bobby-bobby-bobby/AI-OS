@@ -1,0 +1,8 @@
+[Unit]
+Name=search-daemon
+Description=AI-OS search-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/search-daemon.sh
+Restart=on-failure

@@ -1,0 +1,4 @@
+input-daemon: start
+input-daemon: ping
+input-daemon: status
+input-daemon: stop

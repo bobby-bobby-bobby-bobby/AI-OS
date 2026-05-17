@@ -1,0 +1,4 @@
+sound-theme-daemon: start
+sound-theme-daemon: ping
+sound-theme-daemon: status
+sound-theme-daemon: stop

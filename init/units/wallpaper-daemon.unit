@@ -1,0 +1,8 @@
+[Unit]
+Name=wallpaper-daemon
+Description=AI-OS wallpaper-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/wallpaper-daemon.sh
+Restart=on-failure

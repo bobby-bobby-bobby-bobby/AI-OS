@@ -1,0 +1,8 @@
+[Unit]
+Name=icon-theme-daemon
+Description=AI-OS icon-theme-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/icon-theme-daemon.sh
+Restart=on-failure

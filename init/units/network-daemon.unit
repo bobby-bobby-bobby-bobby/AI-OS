@@ -1,0 +1,8 @@
+[Unit]
+Name=network-daemon
+Description=AI-OS network-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/network-daemon.sh
+Restart=on-failure

@@ -1,0 +1,4 @@
+clipboard-daemon: start
+clipboard-daemon: ping
+clipboard-daemon: status
+clipboard-daemon: stop

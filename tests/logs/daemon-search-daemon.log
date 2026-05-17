@@ -1,0 +1,4 @@
+search-daemon: start
+search-daemon: ping
+search-daemon: status
+search-daemon: stop
