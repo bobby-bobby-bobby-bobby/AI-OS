@@ -57,5 +57,4 @@ install -Dm755 "$PROJECT_ROOT/desktop/tray/trayd.sh" "$OUT_ROOT/usr/bin/trayd"
 install -Dm755 "$PROJECT_ROOT/desktop/launcher-grid/launcher-grid.sh" "$OUT_ROOT/usr/bin/launcher-grid"
 install -Dm644 "$PROJECT_ROOT/branding/wallpapers/index.json" "$OUT_ROOT/usr/share/ai-os/wallpapers/index.json"
 install -Dm644 "$PROJECT_ROOT/branding/icons/index.yaml" "$OUT_ROOT/usr/share/ai-os/icons/index.yaml"
-
 echo "rootfs assembled at $OUT_ROOT"
