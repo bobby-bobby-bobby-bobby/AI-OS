@@ -1,0 +1,8 @@
+[Unit]
+Name=hotkey-daemon
+Description=AI-OS hotkey-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/hotkey-daemon.sh
+Restart=on-failure

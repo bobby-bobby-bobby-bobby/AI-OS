@@ -1,0 +1,4 @@
+icon-theme-daemon: start
+icon-theme-daemon: ping
+icon-theme-daemon: status
+icon-theme-daemon: stop

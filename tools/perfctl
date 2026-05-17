@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+cmd="${1:-status}"
+case "$cmd" in
+  status) echo status > /tmp/perf-daemon.fifo; sleep 0.1; cat /tmp/perf-daemon.resp ;;
+  smooth|balanced|battery-saver) echo "set:$cmd" > /tmp/perf-daemon.fifo; sleep 0.1; cat /tmp/perf-daemon.resp ;;
+  *) echo "usage: perfctl {status|smooth|balanced|battery-saver}"; exit 1;;
+esac

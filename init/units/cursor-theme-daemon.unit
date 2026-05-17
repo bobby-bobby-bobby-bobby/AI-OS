@@ -1,0 +1,8 @@
+[Unit]
+Name=cursor-theme-daemon
+Description=AI-OS cursor-theme-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/cursor-theme-daemon.sh
+Restart=on-failure

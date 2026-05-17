@@ -1,0 +1,4 @@
+power-daemon: start
+power-daemon: ping
+power-daemon: status
+power-daemon: stop

@@ -1,0 +1,3 @@
+profile=performance
+safe suspend hook
+brightness set/get stub set 50

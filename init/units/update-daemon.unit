@@ -1,0 +1,8 @@
+[Unit]
+Name=update-daemon
+Description=AI-OS update-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/update-daemon.sh
+Restart=on-failure

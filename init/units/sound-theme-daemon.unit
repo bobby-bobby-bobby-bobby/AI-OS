@@ -1,0 +1,8 @@
+[Unit]
+Name=sound-theme-daemon
+Description=AI-OS sound-theme-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/sound-theme-daemon.sh
+Restart=on-failure
