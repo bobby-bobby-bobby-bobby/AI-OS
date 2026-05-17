@@ -1,3 +1,3 @@
 #!/bin/sh
 set -eu
-echo "browser isolation wrapper stub:" "$@"
+echo "browser isolation wrapper stub: $*"

@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-echo "TODO: implement ${0##*/}"
+#!/bin/sh
+set -eu
+echo "encrypted home setup stub (LUKS/fscrypt integration)"
