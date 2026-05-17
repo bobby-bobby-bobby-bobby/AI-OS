@@ -1,0 +1,3 @@
+compositor: shadows=on transparency=on animations=on
+window snapping=on virtual-desktops=4
+window rules: always-on-top sticky floating tiling(stub)

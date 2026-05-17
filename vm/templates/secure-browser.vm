@@ -1,0 +1,3 @@
+name=secure-browser
+network=isolated
+browser=hardened

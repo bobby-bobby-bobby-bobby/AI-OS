@@ -1,0 +1,4 @@
+created devvm
+devvm cpu=2 ram=2048 disk=20G
+devvm cpu=4 ram=4096
+deleted devvm

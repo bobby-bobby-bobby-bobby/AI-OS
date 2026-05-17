@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+root="${AIOS_INSTALL_ROOT:-/tmp/aios-install-root}"
+cmd="${1:-}"; user="${2:-}"
+case "$cmd" in
+  add) mkdir -p "$root/home/$user"; echo "$user:x" >> "$root/etc/passwd.stub" ;;
+  del) rm -rf "$root/home/$user"; sed -i "/^$user:x$/d" "$root/etc/passwd.stub" 2>/dev/null || true ;;
+  a11y-defaults)
+    shift
+    echo "$*" > "$root/etc/accessibility-defaults.conf" ;;
+  *) echo "usage: userctl {add|del <user>|a11y-defaults key=val...}"; exit 1;;
+esac

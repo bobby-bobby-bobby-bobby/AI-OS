@@ -1,0 +1,3 @@
+# AI-OS secure default sudoers snippet
+Defaults env_reset
+%wheel ALL=(ALL:ALL) ALL

@@ -1,0 +1,4 @@
+media-indexer: start
+media-indexer: ping
+media-indexer: status
+media-indexer: stop

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=pdf-viewer
+Exec=/usr/lib/ai-os/apps/pdf-viewer/app.sh
+Type=Application
+Categories=Utility;
+X-AIOS-ThemeAware=true
+X-AIOS-LocaleAware=true
+X-AIOS-AccessibilityAware=true
