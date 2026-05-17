@@ -1,0 +1,6 @@
+sound settings ui stub
+devices: speakers/headphones/mic
+audio device selector: headphones
+volume OSD: 42%
+microphone gain=80% mute=off
+mute indicator: on
