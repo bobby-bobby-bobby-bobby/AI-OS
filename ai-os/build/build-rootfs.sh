@@ -1,33 +1,26 @@
 #!/bin/sh
-set -e
-
-ROOTFS=rootfs
-TOOLCHAIN=toolchain
-
-echo "[*] Creating root filesystem structure..."
-
-mkdir -p $ROOTFS/{bin,sbin,usr/bin,usr/sbin,usr/lib,lib,etc,proc,sys,dev,tmp,var,home,boot}
-
-# Basic device nodes (AI will expand)
-sudo mknod -m 622 $ROOTFS/dev/console c 5 1 || true
-sudo mknod -m 666 $ROOTFS/dev/null c 1 3 || true
-
-echo "[*] Installing musl libc..."
-if [ -d $TOOLCHAIN/musl-1.2.5 ]; then
-  cd $TOOLCHAIN/musl-1.2.5
-  ./configure --prefix=/usr
-  make
-  make DESTDIR=../../$ROOTFS install
-  cd ../..
+set -eu
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PROJECT_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd)
+OUT_ROOT="$PROJECT_ROOT/ai-os/rootfs"
+HOST_ARCH=$(uname -m)
+TARGET_ARCH="${TARGET_ARCH:-$HOST_ARCH}"
+arm_mode=no
+[ "$HOST_ARCH" = "aarch64" ] || [ "$HOST_ARCH" = "arm64" ] && arm_mode=yes
+if [ "$TARGET_ARCH" != "$HOST_ARCH" ]; then
+  echo "cross target=$TARGET_ARCH host=$HOST_ARCH"
 fi
-
-echo "[*] Installing BusyBox (fallback utilities)..."
-if [ -d $TOOLCHAIN/busybox ]; then
-  cd $TOOLCHAIN/busybox
-  make defconfig
-  make
-  make CONFIG_PREFIX=../../$ROOTFS install
-  cd ../..
+if [ "$arm_mode" = yes ]; then
+  echo "ARM optimization: using prebuilt kernel + skipping heavy native rebuild"
+  [ -x "$PROJECT_ROOT/installer/arm/prebuilt-kernel.sh" ] && "$PROJECT_ROOT/installer/arm/prebuilt-kernel.sh" || true
+else
+  [ -x "$PROJECT_ROOT/init/init" ] || make -C "$PROJECT_ROOT/init" all
+  [ -x "$PROJECT_ROOT/userland/aish/aish" ] || make -C "$PROJECT_ROOT/userland/aish" all
 fi
-
-echo "[*] Root filesystem prepared. AI will populate userland, init, pkgmgr, etc."
+mkdir -p "$OUT_ROOT/usr/lib/ai-os/recovery" "$OUT_ROOT/usr/lib/ai-os/tools"
+install -Dm755 "$PROJECT_ROOT/recovery/recovery-shell.sh" "$OUT_ROOT/usr/lib/ai-os/recovery/recovery-shell.sh"
+install -Dm755 "$PROJECT_ROOT/recovery/bin/fs-repair.sh" "$OUT_ROOT/usr/lib/ai-os/recovery/fs-repair.sh"
+install -Dm755 "$PROJECT_ROOT/recovery/bin/net-repair.sh" "$OUT_ROOT/usr/lib/ai-os/recovery/net-repair.sh"
+install -Dm755 "$PROJECT_ROOT/recovery/ui/snapshot-restore.sh" "$OUT_ROOT/usr/lib/ai-os/recovery/snapshot-restore.sh"
+install -Dm755 "$PROJECT_ROOT/tools/arch-detect/arch-detect.sh" "$OUT_ROOT/usr/lib/ai-os/tools/arch-detect.sh"
+echo "rootfs optimized for $TARGET_ARCH"

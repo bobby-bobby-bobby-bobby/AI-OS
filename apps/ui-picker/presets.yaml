@@ -1,0 +1,4 @@
+ui_shapes: [rounded, square]
+glass_effect: [on, off]
+themes: [light, dark, amoled, pastel, neon]
+icon_packs: [default]

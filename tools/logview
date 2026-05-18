@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+file="${1:-/var/log/update-daemon.log}"
+tail -n "${2:-50}" "$file"

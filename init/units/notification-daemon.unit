@@ -1,0 +1,8 @@
+[Unit]
+Name=notification-daemon
+Description=AI-OS notification-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/notification-daemon.sh
+Restart=on-failure

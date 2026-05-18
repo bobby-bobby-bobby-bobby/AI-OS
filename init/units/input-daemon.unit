@@ -1,0 +1,8 @@
+[Unit]
+Name=input-daemon
+Description=AI-OS input-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/input-daemon.sh
+Restart=on-failure

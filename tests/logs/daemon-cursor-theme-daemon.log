@@ -1,0 +1,4 @@
+cursor-theme-daemon: start
+cursor-theme-daemon: ping
+cursor-theme-daemon: status
+cursor-theme-daemon: stop

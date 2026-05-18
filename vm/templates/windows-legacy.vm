@@ -1,0 +1,3 @@
+name=windows-legacy
+network=nat
+gpu=virtio

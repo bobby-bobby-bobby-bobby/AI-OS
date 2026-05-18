@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=weather
+Exec=/usr/lib/ai-os/apps/weather/app.sh
+Type=Application
+Categories=Utility;
+X-AIOS-ThemeAware=true
+X-AIOS-LocaleAware=true
+X-AIOS-AccessibilityAware=true

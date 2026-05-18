@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+mkdir -p /etc
+[ "${1:-}" = "set" ] || { echo "usage: syslocale set <lang_REGION.UTF-8>"; exit 1; }
+echo "LANG=${2:?}" > /etc/locale.conf

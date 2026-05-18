@@ -1,0 +1,8 @@
+[Unit]
+Name=session-manager
+Description=AI-OS session-manager
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/session-manager.sh
+Restart=on-failure

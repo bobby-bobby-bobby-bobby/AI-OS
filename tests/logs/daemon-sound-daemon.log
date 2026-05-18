@@ -1,0 +1,4 @@
+sound-daemon: start
+sound-daemon: ping
+sound-daemon: status
+sound-daemon: stop

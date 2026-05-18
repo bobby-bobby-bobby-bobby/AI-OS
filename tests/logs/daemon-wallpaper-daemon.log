@@ -1,0 +1,4 @@
+wallpaper-daemon: start
+wallpaper-daemon: ping
+wallpaper-daemon: status
+wallpaper-daemon: stop

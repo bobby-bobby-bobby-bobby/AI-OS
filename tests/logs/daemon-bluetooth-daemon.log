@@ -1,0 +1,4 @@
+bluetooth-daemon: start
+bluetooth-daemon: ping
+bluetooth-daemon: status
+bluetooth-daemon: stop

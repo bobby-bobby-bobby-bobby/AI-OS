@@ -1,0 +1,2 @@
+name=file-search
+handler=ai/core/smart-search.sh

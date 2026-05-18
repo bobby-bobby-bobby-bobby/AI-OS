@@ -1,0 +1,8 @@
+[Unit]
+Name=compositor
+Description=AI-OS compositor
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/compositor.sh
+Restart=on-failure
