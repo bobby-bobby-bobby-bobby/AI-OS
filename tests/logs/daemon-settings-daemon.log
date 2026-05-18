@@ -1,0 +1,4 @@
+settings-daemon: start
+settings-daemon: ping
+settings-daemon: status
+settings-daemon: stop

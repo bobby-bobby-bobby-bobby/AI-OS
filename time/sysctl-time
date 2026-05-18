@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+mkdir -p /etc
+case "${1:-status}" in
+  status) echo "timezone=$(cat /etc/timezone 2>/dev/null || echo UTC)"; echo "adjtime=$(cat /etc/adjtime 2>/dev/null || echo unset)" ;;
+  sync) echo "ntp sync attempt: ${NTP_SERVER:-pool.ntp.org}" > /tmp/ntp-sync.log ;;
+  set) date -u -s "${2:?ISO8601}" >/dev/null 2>&1 || true ;;
+  *) echo "usage: sysctl-time status|sync|set <ISO8601>"; exit 1;;
+esac

@@ -1,0 +1,8 @@
+[Unit]
+Name=bluetooth-daemon
+Description=AI-OS bluetooth-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/bluetooth-daemon.sh
+Restart=on-failure

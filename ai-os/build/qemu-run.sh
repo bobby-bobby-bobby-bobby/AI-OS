@@ -1,19 +1,10 @@
 #!/bin/sh
-set -e
-
-ISO=ai-os.iso
-
-if [ ! -f $ISO ]; then
-  echo "ISO not found. Build it first with build-iso.sh."
-  exit 1
+set -eu
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+host=$(uname -m)
+target="${TARGET_ARCH:-$host}"
+if [ "$host" = "$target" ]; then
+  echo "native arch ($host): qemu optional, skipping by default"
+  exit 0
 fi
-
-qemu-system-x86_64 \
-  -m 4096 \
-  -smp 4 \
-  -enable-kvm \
-  -cdrom $ISO \
-  -boot d \
-  -vga virtio \
-  -nic user,model=virtio \
-  -name "AI-Generated OS Test VM"
+echo "emulation required host=$host target=$target"

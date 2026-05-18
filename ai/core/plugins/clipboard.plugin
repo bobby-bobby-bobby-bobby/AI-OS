@@ -1,0 +1,2 @@
+name=clipboard
+handler=ai/core/smart-clipboard.sh

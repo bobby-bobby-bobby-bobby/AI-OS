@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+db=/etc/ai-os/app-permissions.conf
+mkdir -p /etc/ai-os
+touch "$db"
+cmd="${1:-list}"; app="${2:-}"; rule="${3:-}"
+case "$cmd" in
+  list) cat "$db" ;;
+  set)
+    [ -n "$app" ] && [ -n "$rule" ]
+    grep -v "^${app}:" "$db" > "$db.tmp" || true
+    echo "${app}:${rule}" >> "$db.tmp"
+    mv "$db.tmp" "$db"
+    ;;
+  get) grep "^${app}:" "$db" ;;
+  *) echo "usage: sandboxctl {list|set <app> <rules>|get <app>}"; exit 1 ;;
+esac

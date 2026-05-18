@@ -1,0 +1,5 @@
+plain: [txt, log]
+markdown: [md]
+json: [json]
+xml: [xml]
+code: [c, h, py, js, rs, go]

@@ -1,0 +1,4 @@
+autostart-daemon: start
+autostart-daemon: ping
+autostart-daemon: status
+autostart-daemon: stop

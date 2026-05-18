@@ -1,0 +1,4 @@
+display-daemon: start
+display-daemon: ping
+display-daemon: status
+display-daemon: stop

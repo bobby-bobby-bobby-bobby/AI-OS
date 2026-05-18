@@ -1,115 +1,40 @@
-/*
- * AI-OS Init System — PID 1
- * Minimal init daemon: mounts filesystems, starts services, manages TTYs.
- */
-
+#define _GNU_SOURCE
+#include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <sys/types.h>
+#include <sys/mount.h>
 #include <sys/reboot.h>
-#include <errno.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-#include "mount.h"
-#include "service.h"
-#include "log.h"
-#include "tty.h"
-
-#define INIT_VERSION "0.1.0"
-
-static volatile int g_shutdown = 0;
-static volatile int g_reboot   = 0;
-
-static void signal_handler(int sig) {
-    switch (sig) {
-    case SIGTERM:
-        g_shutdown = 1;
-        break;
-    case SIGINT:
-        g_reboot = 1;
-        break;
-    case SIGCHLD:
-        /* Reap zombie children */
-        while (waitpid(-1, NULL, WNOHANG) > 0)
-            ;
-        break;
-    default:
-        break;
-    }
+static volatile sig_atomic_t running = 1;
+static FILE *f_log, *f_console, *f_serial;
+static void logmsg(const char *fmt, ...) {
+    char buf[512]; va_list ap; va_start(ap, fmt); vsnprintf(buf, sizeof(buf), fmt, ap); va_end(ap);
+    if (f_log) { fprintf(f_log, "%s\n", buf); fflush(f_log); }
+    if (f_console) { fprintf(f_console, "%s\n", buf); fflush(f_console); }
+    if (f_serial) { fprintf(f_serial, "%s\n", buf); fflush(f_serial); }
 }
-
-static void setup_signals(void) {
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = signal_handler;
-    sigemptyset(&sa.sa_mask);
-
-    sigaction(SIGTERM, &sa, NULL);
-    sigaction(SIGINT,  &sa, NULL);
-    sigaction(SIGCHLD, &sa, NULL);
-
-    /* Ignore SIGHUP and SIGPIPE */
-    sa.sa_handler = SIG_IGN;
-    sigaction(SIGHUP,  &sa, NULL);
-    sigaction(SIGPIPE, &sa, NULL);
-}
-
-int main(int argc, char *argv[]) {
-    (void)argc;
-    (void)argv;
-
-    if (getpid() != 1) {
-        fprintf(stderr, "init: must be run as PID 1\n");
-        return 1;
-    }
-
-    /* Set up signal handlers before anything else */
-    setup_signals();
-
-    /* Initialize logging first so we can log mount/service errors */
-    log_init("/var/log/init.log");
-    log_info("AI-OS init v%s starting", INIT_VERSION);
-
-    /* Mount essential filesystems */
-    if (mount_early() != 0) {
-        log_err("Failed to mount essential filesystems — continuing anyway");
-    }
-
-    /* Start service manager */
-    if (service_init("/etc/init/units") != 0) {
-        log_err("Service manager init failed");
-    }
-
-    /* Start TTYs */
-    tty_init();
-
-    /* Start default target services */
-    service_start_target("default");
-
-    log_info("Boot complete — entering main loop");
-
-    /* Main reap loop */
-    while (!g_shutdown && !g_reboot) {
-        pause(); /* wait for signals */
-        /* Reap any dead children */
-        while (waitpid(-1, NULL, WNOHANG) > 0)
-            ;
-    }
-
-    if (g_reboot) {
-        log_info("Rebooting...");
-        service_stop_all();
-        sync();
-        reboot(RB_AUTOBOOT);
-    } else {
-        log_info("Shutting down...");
-        service_stop_all();
-        sync();
-        reboot(RB_POWER_OFF);
-    }
-
-    return 0; /* unreachable */
+static void on_sig(int s){ if(s==SIGTERM||s==SIGINT) running=0; }
+static void ensure_dir(const char *p){ mkdir(p,0755); }
+static void mnt(const char*s,const char*t,const char*f,unsigned long fl,const char*d){ ensure_dir(t); if(mount(s,t,f,fl,d)&&errno!=EBUSY) logmsg("init: mount failed %s on %s: %s",s,t,strerror(errno)); }
+static void spawn_getty(const char *tty){ if(fork()==0){ execlp("/sbin/getty","getty","-L",tty,"115200","vt100",NULL); _exit(127);} }
+int main(void){
+    ensure_dir("/var"); ensure_dir("/var/log"); ensure_dir("/run");
+    f_log=fopen("/var/log/boot.log","a"); f_console=fopen("/dev/console","w"); f_serial=fopen("/dev/ttyS0","w");
+    signal(SIGTERM,on_sig); signal(SIGINT,on_sig);
+    mnt("proc","/proc","proc",MS_NOSUID|MS_NODEV|MS_NOEXEC,NULL);
+    mnt("sysfs","/sys","sysfs",MS_NOSUID|MS_NODEV|MS_NOEXEC,NULL);
+    mnt("devtmpfs","/dev","devtmpfs",MS_NOSUID,"mode=0755");
+    mnt("tmpfs","/run","tmpfs",MS_NOSUID|MS_NODEV,"mode=0755");
+    mount(NULL,"/",NULL,MS_REMOUNT, "rw");
+    logmsg("init: started pid=%d", getpid());
+    spawn_getty("tty1"); spawn_getty("tty2"); spawn_getty("tty3"); spawn_getty("tty4");
+    while(running){ int st=0; pid_t p=waitpid(-1,&st,WNOHANG); if(p>0) logmsg("init: reaped %d",p); usleep(200000);} 
+    logmsg("init: stopping"); sync(); reboot(RB_AUTOBOOT); return 0;
 }

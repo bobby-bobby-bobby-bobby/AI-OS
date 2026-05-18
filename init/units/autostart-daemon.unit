@@ -1,0 +1,8 @@
+[Unit]
+Name=autostart-daemon
+Description=AI-OS autostart-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/autostart-daemon.sh
+Restart=on-failure

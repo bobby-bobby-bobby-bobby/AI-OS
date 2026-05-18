@@ -1,0 +1,8 @@
+[Unit]
+Name=display-daemon
+Description=AI-OS display-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/display-daemon.sh
+Restart=on-failure
