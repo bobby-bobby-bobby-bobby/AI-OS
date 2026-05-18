@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+mkdir -p /var/log/aios-crash
+cmd="${1:-list}"
+case "$cmd" in
+  report) app="${2:-unknown}"; echo "$(date -u +%FT%TZ),$app,simulated crash" >> /var/log/aios-crash/reports.log ;;
+  list) cat /var/log/aios-crash/reports.log 2>/dev/null || true ;;
+  clear) : > /var/log/aios-crash/reports.log ;;
+esac

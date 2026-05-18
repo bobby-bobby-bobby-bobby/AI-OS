@@ -1,0 +1,4 @@
+network-daemon: start
+network-daemon: ping
+network-daemon: status
+network-daemon: stop

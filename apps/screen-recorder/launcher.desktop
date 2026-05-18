@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=screen-recorder
+Exec=/usr/lib/ai-os/apps/screen-recorder/app.sh
+Type=Application
+Categories=Utility;
+X-AIOS-ThemeAware=true
+X-AIOS-LocaleAware=true
+X-AIOS-AccessibilityAware=true

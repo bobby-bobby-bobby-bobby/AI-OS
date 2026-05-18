@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=notifications-center
+Exec=/usr/lib/ai-os/apps/notifications-center/app.sh
+Type=Application
+Categories=Utility;
+X-AIOS-ThemeAware=true
+X-AIOS-LocaleAware=true
+X-AIOS-AccessibilityAware=true

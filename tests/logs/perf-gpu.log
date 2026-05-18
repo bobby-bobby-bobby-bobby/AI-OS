@@ -1,0 +1,4 @@
+detected_gpu=software
+features=compositing,animations,rendering
+acceleration_status=gpu=software acceleration=off
+driver_hints=install mesa/vulkan/opencl stack; vendor-specific driver as needed

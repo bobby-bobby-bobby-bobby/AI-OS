@@ -1,0 +1,3 @@
+# <fs> <mountpoint> <type> <opts> <dump> <pass>
+/dev/sda2 / btrfs defaults 0 1
+/dev/sda1 /boot/efi vfat defaults 0 2

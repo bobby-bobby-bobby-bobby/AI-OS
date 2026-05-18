@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=system-monitor
+Exec=/usr/lib/ai-os/apps/system-monitor/app.sh
+Type=Application
+Categories=Utility;
+X-AIOS-ThemeAware=true
+X-AIOS-LocaleAware=true
+X-AIOS-AccessibilityAware=true

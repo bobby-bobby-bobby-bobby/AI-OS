@@ -1,0 +1,8 @@
+[Unit]
+Name=settings-daemon
+Description=AI-OS settings-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/settings-daemon.sh
+Restart=on-failure

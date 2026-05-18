@@ -1,0 +1,8 @@
+[Unit]
+Name=clipboard-daemon
+Description=AI-OS clipboard-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/clipboard-daemon.sh
+Restart=on-failure

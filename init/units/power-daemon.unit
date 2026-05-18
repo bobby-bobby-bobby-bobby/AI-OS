@@ -1,0 +1,8 @@
+[Unit]
+Name=power-daemon
+Description=AI-OS power-daemon
+After=syslog
+
+[Service]
+ExecStart=/usr/lib/ai-os/services/power-daemon.sh
+Restart=on-failure

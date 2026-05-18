@@ -1,0 +1,4 @@
+notification-daemon: start
+notification-daemon: ping
+notification-daemon: status
+notification-daemon: stop

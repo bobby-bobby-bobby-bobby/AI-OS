@@ -1,0 +1,4 @@
+hotkey-daemon: start
+hotkey-daemon: ping
+hotkey-daemon: status
+hotkey-daemon: stop
