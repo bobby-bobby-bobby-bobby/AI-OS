@@ -2,7 +2,8 @@
 set -eu
 browser="${1:-firefox}"; mode="${2:-sandbox}"
 case "$browser" in edge|chrome|firefox|opera|chromium|brave|vivaldi) ;; *) echo "unsupported"; exit 1;; esac
-echo "$browser" > /tmp/ai-os-default-browser
+mkdir -p /etc/ai-os
+echo "$browser" > /etc/ai-os/default-browser
 echo "installing $browser (stub)"
 echo "apply uBlock Origin defaults (stub)"
 echo "apply DNS-level blocking defaults (stub)"
