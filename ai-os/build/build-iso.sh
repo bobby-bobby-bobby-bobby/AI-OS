@@ -8,7 +8,12 @@ ROOTFS="$AIOS_ROOT/rootfs"
 ISO="$AIOS_ROOT/ai-os.iso"
 
 mkdir -p "$ISO_ROOT/boot/grub"
-[ -f "$AIOS_ROOT/kernel/linux/arch/x86/boot/bzImage" ] && cp "$AIOS_ROOT/kernel/linux/arch/x86/boot/bzImage" "$ISO_ROOT/boot/vmlinuz" || touch "$ISO_ROOT/boot/vmlinuz"
+if [ -f "$AIOS_ROOT/kernel/linux/arch/x86/boot/bzImage" ]; then
+  cp "$AIOS_ROOT/kernel/linux/arch/x86/boot/bzImage" "$ISO_ROOT/boot/vmlinuz"
+else
+  echo "Error: Kernel image not found at $AIOS_ROOT/kernel/linux/arch/x86/boot/bzImage" >&2
+  exit 1
+fi
 
 ( cd "$ROOTFS" && find . -print0 | cpio --null -ov --format=newc ) | gzip -9 > "$ISO_ROOT/boot/initramfs.img"
 mkdir -p "$ISO_ROOT/boot/modules"
